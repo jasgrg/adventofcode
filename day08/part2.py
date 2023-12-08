@@ -37,33 +37,33 @@ def go():
         words = l.split(' ')
         map.add_node(MapNode(words[0], words[2].replace('(', '').replace(',', ''), words[3].replace(')', '')))
         line_number, l, eof = get_next_line()
-    multiples = []
-    d = 0
-    steps = 0
+    path_lengths = []
+    direction_index = 0
+    step_counter = 0
     ghosts = []
     for n in map.nodes:
         if n.name.endswith('A'):
             ghosts.append(map.get_node(n.name))
     total = len(ghosts)
-    while len(multiples) < total:
-        if d == len(directions):
-            d = 0
-        dir = directions[d]
-        if dir == 'R':
+    while len(path_lengths) < total:
+        if direction_index == len(directions):
+            direction_index = 0
+        direction = directions[direction_index]
+        if direction == 'R':
             for g in range(0, len(ghosts)):
                 ghosts[g] = map.get_node(ghosts[g].right)
-        if dir == 'L':
+        if direction == 'L':
             for g in range(0, len(ghosts)):
                 ghosts[g] = map.get_node(ghosts[g].left)
-        steps += 1
-        d += 1
-        for ghot in ghosts:
-            if ghot.name.endswith('Z'):
-                multiples.append(steps)
-                ghosts = [g for g in ghosts if g.name != ghot.name]
-                
+        step_counter += 1
+        direction_index += 1
+        for ghost in ghosts:
+            if ghost.name.endswith('Z'):
+                path_lengths.append(step_counter)
+                ghosts = [g for g in ghosts if g.name != ghost.name]
+
     # find the least common multiple of the lengths of the paths
     lcm = 1
-    for i in multiples:
+    for i in path_lengths:
         lcm = lcm * i // gcd(lcm, i)
     print(lcm)
