@@ -20,4 +20,4 @@ def get_next_line():
         return -1, '', True
     l = lines[line_number].replace('\n', '')
     line_number += 1
-    return line_number, l, False
+    return line_number - 1, l, False
