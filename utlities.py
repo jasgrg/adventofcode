@@ -27,5 +27,13 @@ def regex_search(s, regex):
     return pattern.search(s)
 
 
+def is_numeric(x):
+    try:
+        int(x)
+        return True
+    except ValueError:
+        return False
+
+
 def is_a_whole_number(x):
     return float(x).is_integer()
