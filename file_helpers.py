@@ -11,6 +11,8 @@ def open_file(file_name):
 
 def get_all_lines(file_name):
     open_file(file_name)
+    for i, l in enumerate(lines):
+        lines[i] = l.replace('\n', '')
     return lines
 
 

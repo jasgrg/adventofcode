@@ -37,3 +37,15 @@ def is_numeric(x):
 
 def is_a_whole_number(x):
     return float(x).is_integer()
+
+
+def convert_to_matrix(lines):
+    m = []
+    for r in lines:
+        m.append([c for c in r])
+    return m
+
+
+def draw_matrix(matrix):
+    for r in matrix:
+        print(''.join(r))
