@@ -1,4 +1,4 @@
-from day15.part2 import go
+from day17.part1 import go
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
