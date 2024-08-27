@@ -1,7 +1,8 @@
 from typing import List
 
+from algs.astar import search, MatrixAStarNode
 from file_helpers import get_all_lines
-from utlities import Matrix, MatrixAStar, MatrixAStarNode, Coord
+from utlities import Matrix, Coord
 
 
 def get_direction(p1: Coord, p2: Coord):
@@ -21,6 +22,7 @@ def get_possible_moves(node: MatrixAStarNode, matrix: Matrix) -> List[Coord]:
         if prev_dir == get_direction(node.parent.coordinates, node.parent.parent.coordinates) and \
                 prev_dir == get_direction(node.parent.parent.coordinates, node.parent.parent.parent.coordinates):
             blocked_dir = prev_dir
+    prev_dir = ''
     possible = []
     if node.coordinates.y > 0 and blocked_dir != 'N' and prev_dir != 'S':
         possible.append(Coord(node.coordinates.x, node.coordinates.y - 1))
@@ -36,9 +38,9 @@ def get_possible_moves(node: MatrixAStarNode, matrix: Matrix) -> List[Coord]:
 
 def go():
     matrix = Matrix(get_all_lines("assets/17.txt"))
-    astar = MatrixAStar(matrix, Coord(0, 0), Coord(matrix.get_col_count(0) - 1, matrix.get_row_count() - 1))
-    node = astar.go(get_possible_moves)
-    print(node.value)
+    result = search(matrix, Coord(0, 0), Coord(matrix.get_col_count(0) - 1, matrix.get_row_count() - 1),
+                    get_possible_moves)
+    print(result.value)
     while node.parent is not None:
         matrix.set(node.coordinates.x, node.coordinates.y, '#')
         node = node.parent

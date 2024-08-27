@@ -3,6 +3,11 @@ line_number = 0
 lines = []
 
 
+def read_all_text(file_name):
+    with open(file_name) as f:
+        return f.read()
+
+
 def open_file(file_name):
     global lines
     with open(file_name) as f:

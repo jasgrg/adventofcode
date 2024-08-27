@@ -1,8 +1,26 @@
-from file_helpers import open_file, get_next_line
-
-
 def go():
-    open_file("assets/06.txt")
-    line_number, l, eof = get_next_line()
-    while not eof:
-        line_number, l, eof = get_next_line()
+    input = "1113222113"
+    output = ""
+    for i in range(40):
+        while len(input) > 0:
+            val, cnt, input = find_next_str(input)
+            output += str(cnt) + val
+        print(output)
+        input = output
+        print(len(output))
+        output = ""
+
+
+def find_next_str(input):
+    if len(input) == 1:
+        return input[0], 1, ''
+
+    val = input[0]
+    input = input[1:]
+    cnt = 1
+    while input[0] == val:
+        cnt += 1
+        if len(input) == 1:
+            break
+        input = input[1:]
+    return val, cnt, input
