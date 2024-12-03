@@ -84,6 +84,14 @@ class Matrix:
         for r in lines:
             self.m.append([c for c in r])
 
+    def initialize(self, x_size, y_size, default_value):
+        self.m = []
+        for x in range(y_size):
+            r = []
+            for y in range(x_size):
+                r.append(default_value)
+            self.m.append(r)
+
     def get(self, x, y):
         return self.m[y][x]
 
