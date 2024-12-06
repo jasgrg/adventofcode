@@ -11,6 +11,15 @@ class Coord:
         self.x = x
         self.y = y
 
+    def equals(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def clone(self):
+        return Coord(self.x, self.y)
+
+    def to_string(self):
+        return f'{self.x}, {self.y}'
+
 
 class Vector:
     def __init__(self, pos: Coord, dir: Coord):
@@ -21,6 +30,12 @@ class Vector:
         self.pos.x += self.dir.x
         self.pos.y += self.dir.y
 
+    def clone(self):
+        return Vector(Coord(self.pos.x, self.pos.y), Coord(self.dir.x, self.dir.y))
+
+    def equals(self, other):
+        return self.pos.equals(other.pos) and self.dir.equals(other.dir)
+
 
 vector_directions = {
     'n': Coord(0, -1),
@@ -28,6 +43,13 @@ vector_directions = {
     's': Coord(0, 1),
     'w': Coord(-1, 0)
 }
+
+vector_direction_values = [
+    Coord(0, -1),
+    Coord(1, 0),
+    Coord(0, 1),
+    Coord(-1, 0)
+]
 
 
 def get_distance(p1: Coord, p2: Coord):
@@ -97,6 +119,9 @@ class Matrix:
 
     def set(self, x, y, v):
         self.m[y][x] = v
+
+    def get_rows(self):
+        return self.m
 
     def get_row_count(self):
         return len(self.m)
