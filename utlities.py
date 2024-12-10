@@ -2,6 +2,8 @@ import re
 from functools import reduce
 
 LETTERS = 'abcdefghijklmnopqrstuvwxyz'
+CASED_LETTERS = f'{LETTERS}ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+CHARACTERS = f'0123456789{CASED_LETTERS}'
 VOWELS = 'aeiou'
 CONSONANTS = [a for a in LETTERS if a not in VOWELS]
 
@@ -142,3 +144,6 @@ class Matrix:
                 new_line += self.get(x, y)
             new_lines.append(new_line)
         return Matrix(new_lines)
+
+    def is_in_bounds(self, x, y):
+        return 0 <= y < len(self.m) and 0 <= x < len(self.m[y])
