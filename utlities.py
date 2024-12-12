@@ -22,6 +22,9 @@ class Coord:
     def to_string(self):
         return f'{self.x}, {self.y}'
 
+    def add(self, other):
+        return Coord(self.x + other.x, self.y + other.y)
+
 
 class Vector:
     def __init__(self, pos: Coord, dir: Coord):
@@ -43,7 +46,11 @@ vector_directions = {
     'n': Coord(0, -1),
     'e': Coord(1, 0),
     's': Coord(0, 1),
-    'w': Coord(-1, 0)
+    'w': Coord(-1, 0),
+    'ne': Coord(1, -1),
+    'nw': Coord(-1, -1),
+    'se': Coord(1, 1),
+    'sw': Coord(-1, 1)
 }
 
 vector_direction_values = [
