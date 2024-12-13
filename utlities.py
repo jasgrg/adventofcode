@@ -8,6 +8,16 @@ VOWELS = 'aeiou'
 CONSONANTS = [a for a in LETTERS if a not in VOWELS]
 
 
+###
+# for solving a system of equations of the form:
+# a * x + b * x = cx
+# a * y + b * y = cy
+def cramers(ax, ay, bx, by, cx, cy):
+    a = ((cx * by) - (cy * bx)) / ((ax * by) - (ay * bx))
+    b = ((ax * cy) - (ay * cx)) / ((ax * by) - (ay * bx))
+    return a, b
+
+
 class Coord:
     def __init__(self, x, y):
         self.x = x

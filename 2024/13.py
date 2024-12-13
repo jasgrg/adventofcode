@@ -1,4 +1,5 @@
 from file_helpers import get_all_lines
+from utlities import cramers
 
 
 def part1():
@@ -61,8 +62,7 @@ def part2():
         ax, ay = parse_xy(lines[i])
         bx, by = parse_xy(lines[i + 1])
         px, py = parse_prize(lines[i + 2])
-        a = ((px * by) - (py * bx)) / ((ax * by) - (ay * bx))
-        b = ((ax * py) - (ay * px)) / ((ax * by) - (ay * bx))
+        a, b = cramers(ax, ay, bx, by, px, py)
         if a.is_integer() and b.is_integer():
             total_cost += (a * a_cost) + (b * b_cost)
     print(total_cost)
