@@ -12,6 +12,8 @@ CONSONANTS = [a for a in LETTERS if a not in VOWELS]
 # for solving a system of equations of the form:
 # a * x + b * x = cx
 # a * y + b * y = cy
+# https://www.youtube.com/watch?v=jBsC34PxzoM
+
 def cramers(ax, ay, bx, by, cx, cy):
     a = ((cx * by) - (cy * bx)) / ((ax * by) - (ay * bx))
     b = ((ax * cy) - (ay * cx)) / ((ax * by) - (ay * bx))
@@ -50,6 +52,29 @@ class Vector:
 
     def equals(self, other):
         return self.pos.equals(other.pos) and self.dir.equals(other.dir)
+
+
+class Box:
+    def __init__(self, top_left: Coord, bottom_right: Coord):
+        self.top_left = top_left
+        self.bottom_right = bottom_right
+
+        self.left = self.top_left.x
+        self.top = self.top_left.y
+        self.right = self.bottom_right.x
+        self.bottom = self.bottom_right.y
+
+    def clone(self):
+        return Box(Coord(self.top_left.x, self.top_left.y), Coord(self.bottom_right.x, self.bottom_right.y))
+
+    def move(self, dir: Coord):
+        return Box(self.top_left.add(dir), self.bottom_right.add(dir))
+
+    def intersects(self, other):
+        return not (other.left > self.right
+                    or other.right < self.left
+                    or other.top > self.bottom
+                    or other.bottom < self.top)
 
 
 vector_directions = {
