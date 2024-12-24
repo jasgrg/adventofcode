@@ -1,3 +1,4 @@
+import heapq
 import re
 from functools import reduce
 
@@ -37,6 +38,12 @@ class Coord:
     def add(self, other):
         return Coord(self.x + other.x, self.y + other.y)
 
+    def __hash__(self):
+        return hash(self.to_string())
+
+    def __eq__(self, other):
+        return self.equals(other)
+
 
 class Vector:
     def __init__(self, pos: Coord, dir: Coord):
@@ -52,6 +59,15 @@ class Vector:
 
     def equals(self, other):
         return self.pos.equals(other.pos) and self.dir.equals(other.dir)
+
+    def __eq__(self, other):
+        return self.pos == other.pos and self.dir == other.dir
+
+    def __hash__(self):
+        return hash(f'{self.pos.to_string()}, {self.dir.to_string()}')
+
+    def __str__(self):
+        return self.pos.to_string() + ' ' + vector_direction_arrows[get_direction(self.dir.x, self.dir.y)]
 
 
 class Box:
@@ -88,12 +104,26 @@ vector_directions = {
     'sw': Coord(-1, 1)
 }
 
+
+def get_direction(x, y):
+    for v in vector_directions:
+        if vector_directions[v] == Coord(x, y):
+            return v
+
+
 vector_direction_values = [
     Coord(0, -1),
     Coord(1, 0),
     Coord(0, 1),
     Coord(-1, 0)
 ]
+
+vector_direction_arrows = {
+    'n': '^',
+    'e': '>',
+    's': 'v',
+    'w': '<'
+}
 
 
 def get_distance(p1: Coord, p2: Coord):
@@ -189,3 +219,180 @@ class Matrix:
 
     def is_in_bounds(self, x, y):
         return 0 <= y < len(self.m) and 0 <= x < len(self.m[y])
+
+    def find(self, v):
+        for y in range(0, self.get_row_count()):
+            for x in range(0, self.get_col_count(y)):
+                if self.get(x, y) == v:
+                    return Coord(x, y)
+        raise Exception(f"Cannot find {v}")
+
+
+# class MatrixAStar:
+#     def __init__(self, matrix: Matrix, start: Coord, goal: Coord):
+#         self.matrix = matrix
+#         self.start = start
+#         self.goal = goal
+#         self.open_list = []
+#         self.closed_list = set()
+
+
+class MatrixAStar:
+    class Node:
+        def __init__(self, state: Vector, parent=None, cost=0, heuristic=0):
+            self.state = state
+            self.parent = parent
+            self.cost = cost
+            self.heuristic = heuristic
+
+        def __lt__(self, other):
+            return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+
+    def __init__(self, matrix: Matrix, start: Vector, goal: Coord):
+        self.matrix = matrix
+        self.start = start
+        self.goal = goal
+
+    def reconstruct_path(self, node: Node):
+        path = []
+        while node:
+            path.append(node)
+            node = node.parent
+        path.reverse()
+        return path
+
+    def cost(self, current_node, neighbor):
+        return 1
+
+    def neighbors(self, node: Node):
+        return []
+
+    def calculate_heuristic(self, node):
+        return get_distance(node.pos, self.goal)
+
+    def debug(self, cur_node):
+        debug = self.matrix.clone()
+        path = [s.state for s in self.reconstruct_path(cur_node)]
+
+        for p in path:
+            debug.set(p.pos.x, p.pos.y, vector_direction_arrows[get_direction(p.dir.x, p.dir.y)])
+
+        debug.draw()
+
+    def search(self):
+        open_list = []
+        closed_list = set()
+
+        start_node = self.Node(self.start, None, 0, self.calculate_heuristic(self.start))
+        heapq.heappush(open_list, start_node)
+        while open_list:
+            current_node = heapq.heappop(open_list)
+            # self.debug(current_node)
+            if current_node.state.pos == self.goal:
+                return self.reconstruct_path(current_node)
+            closed_list.add(current_node.state)
+
+            for neighbor in self.neighbors(current_node):
+                if neighbor in closed_list:
+                    continue
+                neighbor_node = self.Node(state=neighbor,
+                                          parent=current_node,
+                                          cost=current_node.cost + self.cost(current_node, neighbor),
+                                          heuristic=self.calculate_heuristic(neighbor))
+
+                if all(neighbor_node.state != open_node.state for open_node in open_list):
+                    heapq.heappush(open_list, neighbor_node)
+                else:
+                    for open_node in open_list:
+                        if neighbor_node.state == open_node.state and neighbor_node.cost < open_node.cost:
+                            open_node.parent = current_node
+                            open_node.cost = neighbor_node.cost
+                            break
+        return None
+
+
+class MatrixAStarWithOverlap:
+    class Node:
+        def __init__(self, state: Vector, parent=None, cost=0, heuristic=0):
+            self.state = state
+            self.parent = [parent] if parent is not None else None
+            self.cost = cost
+            self.heuristic = heuristic
+
+        def __lt__(self, other):
+            return (self.cost + self.heuristic) < (other.cost + other.heuristic)
+
+    def __init__(self, matrix: Matrix, start: Vector, goal: Coord):
+        self.matrix = matrix
+        self.start = start
+        self.goal = goal
+
+    def reconstruct_path(self, node: Node):
+        path = []
+        while node:
+            path.append(node)
+            node = node.parent[0] if node.parent is not None else None
+        path.reverse()
+        return path
+
+    def cost(self, current_node, neighbor):
+        return 1
+
+    def neighbors(self, node: Node):
+        return []
+
+    def calculate_heuristic(self, node):
+        return get_distance(node.pos, self.goal)
+
+    def debug(self, cur_node):
+        debug = self.matrix.clone()
+        path = [s.state for s in self.reconstruct_path(cur_node)]
+
+        for p in path:
+            debug.set(p.pos.x, p.pos.y, vector_direction_arrows[get_direction(p.dir.x, p.dir.y)])
+
+        debug.draw()
+
+    def search_for_all_shortest_paths_with_overlap(self):
+        open_list = []
+        shortest_paths = []
+        min_cost = float('inf')
+
+        start_node = self.Node(self.start, None, 0, self.calculate_heuristic(self.start))
+        heapq.heappush(open_list, start_node)
+        while open_list:
+            current_node = heapq.heappop(open_list)
+            if current_node.cost > min_cost:
+                continue
+
+            # self.debug(current_node)
+
+            if current_node.state.pos == self.goal:
+                path = self.reconstruct_path(current_node)
+                if current_node.cost < min_cost:
+                    min_cost = current_node.cost
+                    shortest_paths = [path]
+                elif current_node.cost == min_cost:
+                    shortest_paths.append(path)
+                print(f'found {len(shortest_paths)} paths')
+                continue
+
+            for neighbor in self.neighbors(current_node):
+                neighbor_node = self.Node(state=neighbor,
+                                          parent=current_node,
+                                          cost=current_node.cost + self.cost(current_node, neighbor),
+                                          heuristic=self.calculate_heuristic(neighbor))
+
+                if all(neighbor_node.state != open_node.state for open_node in open_list):
+                    heapq.heappush(open_list, neighbor_node)
+                else:
+                    for open_node in open_list:
+                        if neighbor_node.state == open_node.state:
+                            if neighbor_node.cost < open_node.cost:
+                                open_node.parent = [current_node]
+                                open_node.cost = neighbor_node.cost
+                                break
+                            elif neighbor_node.cost == open_node.cost:
+                                open_node.parent.append(current_node)
+                                break
+        return shortest_paths
