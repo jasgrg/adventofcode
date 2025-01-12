@@ -21,6 +21,30 @@ def cramers(ax, ay, bx, by, cx, cy):
     return a, b
 
 
+def memoize(f):
+    cache = {}
+
+    def foo(x):
+        key = f"{x}"
+        if key not in cache:
+            cache[key] = f(x)
+        return cache[key]
+
+    return foo
+
+
+def memoize_2(f):
+    cache = {}
+
+    def foo(x, y):
+        key = f"{x}:{y}"
+        if key not in cache:
+            cache[key] = f(x, y)
+        return cache[key]
+
+    return foo
+
+
 class Coord:
     def __init__(self, x, y):
         self.x = x
@@ -152,6 +176,10 @@ def regex_findall(s, regex):
     return pattern.findall(s)
 
 
+def regex_replace_all(pattern, repl, string):
+    return re.sub(pattern, repl, string)
+
+
 def is_numeric(x):
     try:
         int(x)
@@ -162,6 +190,30 @@ def is_numeric(x):
 
 def is_a_whole_number(x):
     return float(x).is_integer()
+
+
+def bitwise_and(a, b):
+    return a & b
+
+
+def bitwise_or(a, b):
+    return a | b
+
+
+def bitwise_xor(a, b):
+    return a ^ b
+
+
+def bitwise_not(a):
+    return ~a
+
+
+def bitwise_left_shift(a, positions):
+    return a << positions
+
+
+def bitwise_right_shift(a, positions):
+    return a >> positions
 
 
 def factors(n):
@@ -265,7 +317,16 @@ class MatrixAStar:
         return 1
 
     def neighbors(self, node: Node):
-        return []
+        neighbors = []
+        for d in vector_direction_values:
+            next = node.state.pos.add(d)
+            if (node.parent is None or node.parent.state.pos != next) and \
+                    self.matrix.is_in_bounds(next.x, next.y) and \
+                    self.matrix.get(next.x,
+                                    next.y) != '#':
+                neighbors.append(Vector(next, d))
+
+        return neighbors
 
     def calculate_heuristic(self, node):
         return get_distance(node.pos, self.goal)

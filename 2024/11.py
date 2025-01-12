@@ -1,21 +1,10 @@
 from file_helpers import get_all_lines
+from utlities import memoize_2
 
 line = get_all_lines("11.txt")[0]
 
 rocks = line.split(' ')
 blinks = 75
-
-
-def memoize(f):
-    cache = {}
-
-    def foo(x, y):
-        key = f"{x}:{y}"
-        if key not in cache:
-            cache[key] = f(x, y)
-        return cache[key]
-
-    return foo
 
 
 def expand_all(rocks, blink):
@@ -25,7 +14,7 @@ def expand_all(rocks, blink):
     return total
 
 
-@memoize
+@memoize_2
 def expand(r, blink):
     global total
     if blink == blinks:
